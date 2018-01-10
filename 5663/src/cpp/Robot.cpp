@@ -7,14 +7,11 @@
 #include <PowerDistributionPanel.h>
 #include "ctre/Phoenix.h"
 #include <PIDOutput.h>
-<<<<<<< HEAD
-=======
 
 const static double kP = 1.0f;
 const static double kI = 0.00f;
 const static double kD = 0.00f;
 const static double kF = 0.00f;
->>>>>>> Jake/Auto
 
 using namespace frc;
 using namespace curtinfrc;
@@ -39,37 +36,25 @@ class Robot : public IterativeRobot {
 			*gear_motor = new Victor(4);
   AHRS *ahrs;
   PIDController *turn;
-<<<<<<< HEAD
-=======
   gyroPID *out;
->>>>>>> Jake/Auto
 public:
   double deadzone = 0.04;
   string gameData;
-  int Auto, gearMode;
+  int Auto, gearMode, Dpad;
+  double LT, RT, RX, RY, LX, LY, speedL, speedR, rate, dist, center;
+  bool LB, RB, back, start, A, B, X, Y, up, down, left, right, IR, IR2, LS, RS;
   void RobotInit() {
     xbox = new XboxController(0);
-<<<<<<< HEAD
-    pdp = new PowerDistributionPanel(0);
-    AutoChooser = new SendableChooser<int*>;
-    left1 = new TalonSRX(1); left2 = new TalonSRX(2); left3 = new TalonSRX(3);
-    right1 = new TalonSRX(4); right2 = new TalonSRX(4); right3 = new TalonSRX(5);
-    leftGear = new DoubleSolenoid(0,0,1); rightGear = new DoubleSolenoid(0,2,3);
-    AutoChooser->AddDefault("Cross Baseline",(int*) 0);
-    AutoChooser->AddObject("Auto 1",(int*) 1);
-    AutoChooser->AddObject("Auto 2",(int*) 2);
-=======
     out = new gyroPID();
     ahrs = new AHRS(I2C::Port::kMXP);
     ahrs->EnableLogging(true);
-    turn = new PIDController(kP,kI,kD,kF,ahrs,this);
+    turn = new PIDController(kP,kI,kD,kF,ahrs,out);
     turn->SetInputRange(-180.0, 180.0);
     turn->SetOutputRange(-1.0,1.0);
     turn->SetAbsoluteTolerance(2.0);
     turn->SetContinuous(true);
     getValues();
     updateDash();
->>>>>>> Jake/Auto
   }
 
   void Drive(double l, double r) {
@@ -77,12 +62,8 @@ public:
     // if(-deadzone < r && r < deadzone) r == 0;
     l *= abs(l);
     r *= abs(r); // square inputs
-<<<<<<< HEAD
-     left1->Set(ControlMode::PercentOutput,l); left2->Set(ControlMode::PercentOutput,l); left3->Set(ControlMode::PercentOutput,l);
-     right1->Set(ControlMode::PercentOutput,l); right2->Set(ControlMode::PercentOutput,l); right2->Set(ControlMode::PercentOutput,l);
-=======
     left1->Set(l); left2->Set(l);
-    right1->Set(r); right2->Set(r);
+    right1->Set(l); right2->Set(l);
   }
 
   void getValues() { //Set variables for the xbox controller values for easy coding (put in seperate file?)
@@ -123,7 +104,6 @@ public:
     SmartDashboard::PutNumber("Right Stick Y", RY);
     SmartDashboard::PutNumber("Left Trigger", LT);
     SmartDashboard::PutNumber("Right Trigger", RT);
->>>>>>> Jake/Auto
   }
 
   void AutonomousInit() {
@@ -142,24 +122,12 @@ public:
     turn->Enable();
   }
   void TeleopPeriodic() {
-<<<<<<< HEAD
     Drive(xbox->GetY(xbox->kLeftHand),xbox->GetY(xbox->kRightHand));
-    if(xbox->GetBumperPressed(xbox->kLeftHand) == true) {
-      if(rightGear->Get() == rightGear->kForward) gearMode = rightGear->kReverse;
-      else gearMode = rightGear->kForward;
-    }
-    if(gearMode == rightGear->kForward) {
-      rightGear->Set(rightGear->kForward);
-      leftGear->Set(rightGear->kForward);
-    } else {
-      rightGear->Set(rightGear->kReverse);
-      leftGear->Set(rightGear->kReverse);
-    }
   }
 
-  void TestInit() {
+  void TestInit() {  }
 
-=======
+  void TestPeriodic() {
     getValues();
     updateDash();
     if(A) {
@@ -174,11 +142,7 @@ public:
     SmartDashboard::PutBoolean("IMU_IsCalibrating", ahrs->IsCalibrating());
     SmartDashboard::PutNumber("Angle", ahrs->GetAngle());
     SmartDashboard::PutNumber("Setpoint", turn->GetSetpoint());
-    SmartDashboard::PutNumber("PID output" , turn->Get());
->>>>>>> Jake/Auto
-  }
-
-  void TestPeriodic() {
+    SmartDashboard::PutNumber("PID output" , out->GetOutput());
   }
 };
 
